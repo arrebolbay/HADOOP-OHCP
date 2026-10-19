@@ -172,10 +172,13 @@ def hadoop_env():
 def font_path():
     """返回可用的中文字体路径（首次克隆仓库时自动尝试系统中文字体）。"""
     candidates = [
-        FONT_FILE, FALLBACK_FONT,
+        FONT_FILE,
+        FONT_DIR / "wqy-microhei.ttc",
+        FALLBACK_FONT,
         "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
         "/usr/share/fonts/truetype/arphic/uming.ttc",
         "/mnt/c/Windows/Fonts/msyh.ttc",
         "/mnt/c/Windows/Fonts/simhei.ttf",

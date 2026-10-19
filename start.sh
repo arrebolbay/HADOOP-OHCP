@@ -18,6 +18,9 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# 新克隆仓库里 data/ 与 logs/ 可能只有 README，先把运行目录补齐
+mkdir -p logs output/charts data/raw/daily data/raw/chunks data/cache/cleaned
+
 PORT="${AQ_WEB_PORT:-8000}"
 PLANNER="${AQ_PLANNER:-auto}"
 OPEN_BROWSER=1
@@ -68,13 +71,14 @@ fi
 
 # ---------- 3. 数据自检 / 自动准备 ----------
 DAILY=$(find data/raw/daily -maxdepth 1 -name 'china_cities_*.csv' 2>/dev/null | wc -l | tr -d ' ')
+TIANCHI=$(find data/raw/tianchi -maxdepth 1 -name '*.csv' 2>/dev/null | wc -l | tr -d ' ')
 CLEAN=$(find data/cache/cleaned -maxdepth 1 -name 'air_quality_*.csv' 2>/dev/null | wc -l | tr -d ' ')
-echo "[数据] 原始日文件 ${DAILY} 天，清洗分片 ${CLEAN} 个"
+echo "[数据] 原始日文件 ${DAILY} 天，天池 CSV ${TIANCHI} 个，清洗分片 ${CLEAN} 个"
 
 if [ "$PREPARE" -eq 1 ] || [ "$CLEAN" -eq 0 ]; then
-  if [ "$DAILY" -eq 0 ] && [ ! -d data/raw/tianchi ]; then
-    echo "[数据] 未找到原始数据：请先运行"
-    echo "        python3 scripts/download_real_data.py --start 2024-01-01 --end 2024-12-31"
+  if [ "$DAILY" -eq 0 ] && [ "$TIANCHI" -eq 0 ]; then
+    echo "[数据] 未找到原始数据。请先执行："
+    echo "        python3 scripts/download_real_data.py --start 2024-01-01 --end 2024-12-31 --workers 6"
     echo "        或把天池 CSV 放到 data/raw/tianchi/"
     exit 1
   fi

@@ -4,8 +4,9 @@
 > 全链路：**真实数据 → 分片清洗 → HDFS → Hive 数仓 → MapReduce 对账 → MySQL → ReAct Agent → 图表 + 结论**。
 > 全程本地数据、可复现、可测试，现场不联网下载数据。
 >
-> **License：MIT**（见 [LICENSE](LICENSE)）。仓库不含约 550MB 的原始/中间数据，
-> 按下方两条命令即可下载与重建，保证结果可复现。
+> **License：MIT**（见 [LICENSE](LICENSE)）。仓库包含 2024 年全量真实数据与清洗分片
+> （约 560MB，克隆会稍慢），克隆后可直接一键运行；数据版权归原始发布机构，
+> 不适用 MIT，详见 [`data/README.md`](data/README.md)。
 
 ---
 
@@ -50,6 +51,7 @@
 ```bash
 git clone git@github.com:arrebolbay/HADOOP-OHCP.git
 cd HADOOP-OHCP
+# 仓库约 600MB（含全量数据），克隆需要一点时间
 ```
 
 ### 1. 环境
@@ -71,19 +73,28 @@ jps          # 应看到 NameNode / DataNode / ResourceManager / NodeManager
 pip install -r requirements.txt
 ```
 
-### 2. 赛前准备真实数据（有网时执行一次）
+### 2. 数据（已随仓库提供，可直接运行）
+
+仓库已包含 2024 年真实数据、按月分片与清洗分片，**克隆后无需下载即可启动**。
+数据说明与版权声明见 [`data/README.md`](data/README.md)。
+
+如需重新下载 / 重建（可选）：
 
 ```bash
-python3 scripts/download_real_data.py --start 2024-01-01 --end 2024-12-31
-python3 scripts/build_province_map.py      # 生成城市→省份参考表
+python3 scripts/download_real_data.py --start 2024-01-01 --end 2024-12-31 --workers 6
+# 城市→省份参考表已随仓库提供；如需重新生成（联网）：
+# python3 scripts/build_province_map.py
 ```
 
-> 网络受限时，也可把天池数据集（dataId=14038）导出为长表 CSV 放到
-> `data/raw/tianchi/`，`step02` 会自动识别（见《数据集说明.md》）。
+> 也可以把天池数据集（dataId=14038）导出为长表 CSV 放到 `data/raw/tianchi/`，
+> `step02` 会自动识别（见《数据集说明.md》）。
 
 ### 3. 一键启动（推荐）
 
 ```bash
+# 可选：新克隆自检（依赖、数据、37 项测试）
+python3 scripts/check_fresh_clone.sh
+
 chmod +x start.sh
 ./start.sh                 # 后端 API + 前端页面一起启动，自动打开浏览器
 ./start.sh --planner=rule  # 无网络 / 无大模型 Key 时的演示模式
@@ -381,8 +392,9 @@ python3 steps/step12_run_tests.py            # 生成 output/test_report.txt
 本项目采用 **MIT License**，见根目录 [LICENSE](LICENSE)。
 
 - 代码、文档、图表与测试可自由使用、修改、分发（保留版权声明）；
-- **数据不随仓库分发**：通过 `scripts/download_real_data.py` 从公开平台获取，
-  数据版权归原始发布机构；天池数据请遵循其数据协议；
-- 仓库不含商业中文字体，请自行放入有授权的中文字体（见 `data/fonts/README.md`）。
+- **监测数据已随仓库提供，但不适用 MIT**：版权归原始发布机构，
+  仅用于教学/比赛分析；再分发请遵循原始平台条款（见 [`data/README.md`](data/README.md)）；
+- 中文字体使用开源 **文泉驿微米黑（Apache-2.0 / GPL-3+ with Font exception）**，
+  见 `data/fonts/WQY-MicroHei-LICENSE.txt`；商业字体（SimHei/微软雅黑）不随仓库分发。
 
 

@@ -1,0 +1,23 @@
+{
+  "available": true,
+  "dataset": "全国城市空气质量2024（真实公开数据）",
+  "year": 2024,
+  "source": "/home/bayern/编程空间/OHCP/tests/fixtures",
+  "cleaned": false,
+  "chunks": 1,
+  "rows": 288,
+  "cities": 4,
+  "provinces": 4,
+  "date_min": "2024-01-01",
+  "date_max": "2024-01-03",
+  "size_mb": 0.0,
+  "missing_ratio": {
+    "pm25": 0.0,
+    "pm10": 0.0,
+    "so2": 0.0,
+    "no2": 0.0,
+    "co": 0.0,
+    "o3": 0.0,
+    "aqi": 0.0
+  }
+}

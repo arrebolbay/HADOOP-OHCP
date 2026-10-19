@@ -149,8 +149,9 @@ def main():
 
     daily_files = sorted(config.RAW_DAILY_DIR.glob("china_cities_*.csv"))
     tianchi_dir = config.DATA_DIR / "raw" / "tianchi"
-    if not daily_files and tianchi_dir.exists():
-        info("未发现日文件，改用天池数据集适配模式")
+    tianchi_csvs = sorted(tianchi_dir.glob("*.csv")) if tianchi_dir.exists() else []
+    if not daily_files and tianchi_csvs:
+        info(f"未发现日文件，改用天池数据集适配模式（{len(tianchi_csvs)} 个 CSV）")
         df = load_tianchi_long(tianchi_dir, province_map)
         if df is None or df.empty:
             error("天池目录里没有可用 CSV")

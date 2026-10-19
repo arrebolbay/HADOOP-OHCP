@@ -1,19 +1,18 @@
 # 字体目录说明
 
-仓库**不包含**中文字体文件（SimHei / 微软雅黑等为商业字体，避免版权问题）。
+仓库包含 **文泉驿微米黑（WenQuanYi Micro Hei）** 作为默认可用的开源中文字体：
 
-`config.font_path()` 会按以下顺序自动寻找可用字体：
+- 文件：`wqy-microhei.ttc`（约 5MB）
+- 许可证：Apache-2.0 或 GPL-3+ with Font exception（见 `WQY-MicroHei-LICENSE.txt`）
+- 代码会自动使用 `data/fonts/wqy-microhei.ttc`，无需额外配置
 
-1. `data/fonts/simhei.ttf`（推荐：自行放入一个有授权的中文字体）
-2. 项目父目录 `data/fonts/simhei.ttf`
-3. 系统 Noto CJK / 文泉驿等开源字体
-4. Windows 字体目录（WSL 环境：`/mnt/c/Windows/Fonts/msyh.ttc`）
-
-如果图表中文显示为方框，请把一个有授权的中文字体复制为：
+如需换成其他字体，可放入：
 
 ```bash
-mkdir -p data/fonts
 cp /path/to/your/font.ttf data/fonts/simhei.ttf
 ```
 
-再重新运行绘图步骤即可。
+`config.font_path()` 的查找顺序：`simhei.ttf` → `wqy-microhei.ttc` → 系统 Noto/文泉驿 →
+Windows 字体目录（WSL：`/mnt/c/Windows/Fonts/`）。
+
+> 商业字体（SimHei、微软雅黑等）不随仓库分发，避免版权问题。
