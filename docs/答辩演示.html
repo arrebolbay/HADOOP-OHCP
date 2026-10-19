@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>空气质量时序分析 Agent · 答辩演示</title>
+<style>
+:root {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --brand: #0f766e;
+  --brand-2: #0e7490;
+  --soft: #f0fdfa;
+  --bg: #07121c;
+  --card: #ffffff;
+  --ok: #047857;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1000px 600px at 15% -10%, #0f3f46 0%, transparent 55%),
+    radial-gradient(900px 600px at 100% 110%, #0c4a6e 0%, transparent 55%),
+    linear-gradient(160deg, #07121c, #0b1b28 60%, #07121c);
+  overflow: hidden;
+}
+.deck { position: relative; height: 100vh; display: flex; flex-direction: column; }
+
+/* top bar */
+.top {
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 30px 8px;
+  color: #cbd5e1;
+}
+.brand { font-size: 12px; letter-spacing: 1.4px; display: flex; align-items: center; gap: 10px; }
+.brand i {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #2dd4bf; box-shadow: 0 0 14px #2dd4bf; display: inline-block;
+}
+.hint { font-size: 11px; color: #7c93a8; letter-spacing: .5px; }
+.hint kbd {
+  font-family: var(--mono); font-size: 10px; padding: 2px 6px;
+  border: 1px solid #2b4356; border-radius: 5px; color: #b9cbd8;
+}
+
+/* stage */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  margin: 8px 30px;
+  display: flex; align-items: stretch; justify-content: center;
+  min-height: 0;
+}
+.slide-wrap {
+  position: relative;
+  width: 100%; max-width: 1320px; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.slide {
+  display: none;
+  width: 100%; height: 100%;
+  max-height: 100%;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 40px 54px 46px;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, .35);
+  overflow: auto;
+  position: relative;
+}
+.slide.active { display: flex; flex-direction: column; animation: enter .28s ease; }
+.slide::before {
+  content: "";
+  position: absolute; left: 0; top: 0; right: 0; height: 7px;
+  background: linear-gradient(90deg, #0f766e, #06b6d4 55%, #38bdf8);
+  border-radius: 22px 22px 0 0;
+}
+.slide h2 {
+  margin: 8px 0 6px;
+  font-size: clamp(24px, 2.5vw, 34px);
+  letter-spacing: .5px;
+}
+.slide h2 .no {
+  font-family: var(--mono);
+  font-size: .55em; color: #99f6e4;
+  background: #0f766e; padding: 2px 8px; border-radius: 7px;
+  vertical-align: middle; margin-right: 10px; letter-spacing: 1px;
+}
+.subtitle { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+.slide h3 { margin: 0 0 8px; font-size: 15px; color: var(--brand); }
+.body { flex: 1 1 auto; min-height: 0; }
+
+/* cover */
+.cover { justify-content: center; text-align: left; }
+.cover .kicker {
+  display: inline-block; font-size: 12px; letter-spacing: 2px;
+  color: #0f766e; background: var(--soft); border: 1px solid #99f6e4;
+  padding: 6px 13px; border-radius: 999px; margin-bottom: 18px;
+  width: fit-content;
+}
+.cover h1 {
+  margin: 0 0 12px;
+  font-size: clamp(38px, 5vw, 66px);
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+.cover h1 span {
+  background: linear-gradient(90deg, #0f766e, #0891b2);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cover .lead { font-size: clamp(15px, 1.5vw, 20px); color: #334155; margin: 0 0 26px; line-height: 1.7; }
+.cover .chips { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 30px; }
+.cover .chips span {
+  font-size: 12px; padding: 7px 12px; border-radius: 9px;
+  background: #f8fafc; border: 1px solid var(--line); color: #334155;
+}
+.cover .agenda { display: flex; gap: 26px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+.cover .agenda b { color: var(--brand); font-size: 15px; display: block; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<style>
+/* ---------- 通用布局 ---------- */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: #fbfdff;
+}
+.card .tag {
+  font-family: var(--mono);
+  font-size: 10.5px; color: #0e7490;
+  background: #ecfeff; border: 1px solid #a5f3fc;
+  padding: 3px 7px; border-radius: 6px;
+  display: inline-block; margin-bottom: 8px;
+}
+.card h4 { margin: 0 0 5px; font-size: 15px; }
+.card p { margin: 0; font-size: 12.5px; line-height: 1.65; color: #475569; }
+.card b { color: #0f172a; }
+
+/* ---------- 技术栈 ---------- */
+.stack-note {
+  margin-top: 16px; padding: 10px 14px;
+  border-left: 3px solid #14b8a6;
+  background: linear-gradient(90deg, #f0fdfa, #f8fafc);
+  border-radius: 0 10px 10px 0;
+  font-size: 12.5px; color: #0f5132;
+}
+
+/* ---------- 架构流水线 ---------- */
+.flow { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+.flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flow-node {
+  padding: 11px 14px;
+  border-radius: 11px;
+  border: 1px solid #bae6fd;
+  background: #f0f9ff;
+  font-size: 12.5px;
+  color: #0c4a6e;
+  line-height: 1.35;
+}
+.flow-node b { display: block; font-size: 13px; }
+.flow-node.hi { background: #f0fdfa; border-color: #99f6e4; color: #0f766e; }
+.flow-node.dark { background: #0f172a; border-color: #0f172a; color: #e2e8f0; }
+.flow-node.dark b { color: #5eead4; }
+.flow-arrow { color: #94a3b8; font-size: 16px; }
+.flow-caption { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+/* ---------- 优点 / 局限 ---------- */
+.points { display: flex; flex-direction: column; gap: 11px; }
+.point { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
+.point .num {
+  width: 28px; height: 28px; border-radius: 9px;
+  background: #ccfbf1; color: #0f766e;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 12px;
+}
+.point h4 { margin: 0 0 3px; font-size: 14.5px; }
+.point p { margin: 0; font-size: 12.5px; color: #475569; line-height: 1.6; }
+.point code { font-family: var(--mono); font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 5px; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table th { font-size: 11px; color: var(--muted); letter-spacing: .5px; font-weight: 600; }
+.table td:first-child { font-weight: 600; width: 30%; }
+.table td:last-child { color: #0f5132; }
+</style>
+
+<style>
+/* ---------- 指标 ---------- */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+.metric {
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px; background: linear-gradient(180deg, #f8fafc, #fff);
+}
+.metric b { display: block; font-size: 30px; line-height: 1.1; color: #0f766e; letter-spacing: -.5px; }
+.metric span { font-size: 11.5px; color: var(--muted); }
+.proof { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.proof span {
+  font-size: 11.5px; padding: 6px 10px; border-radius: 8px;
+  background: #f1f5f9; border: 1px solid var(--line); color: #334155;
+}
+.proof b { color: #0f766e; }
+.quote {
+  margin-top: 16px; padding: 12px 16px;
+  border-radius: 12px; background: #0f172a; color: #cbd5e1;
+  font-size: 12.5px; line-height: 1.7;
+}
+.quote b { color: #5eead4; }
+
+/* ---------- 录屏路线 ---------- */
+.route { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.step {
+  border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+  background: #fbfdff; position: relative;
+}
+.step .time {
+  font-family: var(--mono); font-size: 10.5px; color: #0e7490;
+  background: #ecfeff; border: 1px solid #a5f3fc;
+  border-radius: 6px; padding: 3px 6px; display: inline-block; margin-bottom: 8px;
+}
+.step h4 { margin: 0 0 5px; font-size: 13.5px; }
+.step p { margin: 0; font-size: 11.5px; line-height: 1.65; color: #475569; }
+.checklist { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.checklist span {
+  font-size: 11.5px; padding: 6px 10px; border-radius: 8px;
+  background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857;
+}
+
+/* ---------- 底部导航 ---------- */
+.bottom {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 30px 16px;
+  color: #94a3b8;
+}
+.progress { flex: 1; height: 4px; background: #1e3345; border-radius: 4px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #2dd4bf, #38bdf8); transition: width .25s ease; }
+.counter { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; min-width: 52px; text-align: right; }
+.nav { display: flex; gap: 8px; }
+.nav button {
+  width: 32px; height: 30px; border-radius: 8px;
+  border: 1px solid #27465c; background: #0d2333; color: #b9cbd8;
+  cursor: pointer; font-size: 14px; line-height: 1;
+}
+.nav button:hover { border-color: #2dd4bf; color: #5eead4; }
+
+/* ---------- 讲稿 ---------- */
+.notes {
+  position: fixed; right: 22px; top: 62px; bottom: 70px;
+  width: 360px; max-width: 40vw;
+  background: rgba(8, 20, 30, .97);
+  border: 1px solid #1e3a4c;
+  border-radius: 14px;
+  color: #cbd5e1;
+  padding: 16px 18px;
+  overflow: auto;
+  display: none;
+  z-index: 40;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .45);
+}
+.notes.open { display: block; }
+.notes h3 { margin: 0 0 10px; font-size: 12px; color: #5eead4; letter-spacing: 1px; }
+.notes p { margin: 0 0 10px; font-size: 12px; line-height: 1.75; }
+.notes .t { color: #7dd3fc; font-family: var(--mono); font-size: 10.5px; }
+.notes ul { margin: 0 0 10px; padding-left: 18px; font-size: 11.5px; line-height: 1.7; }
+
+@keyframes enter { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1100px) {
+  .slide { padding: 26px 26px 30px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .route { grid-template-columns: 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .hint { display: none; }
+}
+@media print {
+  body { background: #fff; overflow: visible; }
+  .top, .bottom, .notes { display: none !important; }
+  .deck, .stage, .slide-wrap { display: block; height: auto; margin: 0; }
+  .slide { display: flex !important; page-break-after: always; box-shadow: none; border: 1px solid #ddd; height: 92vh; }
+}
+</style>
+
+<div class="deck" id="deck">
+  <header class="top">
+    <div class="brand"><i></i> 空气质量时序分析 Agent · 答辩演示</div>
+    <div class="hint">
+      <kbd>←</kbd><kbd>→</kbd> 翻页 · <kbd>N</kbd> 讲稿 · <kbd>F</kbd> 全屏
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="slide-wrap" id="slideWrap">
+
+      <!-- 1 封面 -->
+      <section class="slide cover active">
+        <div class="kicker">OHCP · 一小时智能编程大赛</div>
+        <h1>空气质量时序分析 <span>Agent</span></h1>
+        <p class="lead">
+          一句话提问，自动完成
+          <b>分片清洗 → 聚合统计 → GB 3095 超标研判 → 图表与结论</b>
+        </p>
+        <div class="chips">
+          <span>真实公开监测数据</span>
+          <span>Hadoop + Hive + MapReduce</span>
+          <span>MySQL 结果库</span>
+          <span>ReAct 双模规划</span>
+          <span>37 项自动化测试</span>
+        </div>
+        <div class="agenda">
+          <div><b>1.5 min</b>技术栈 · 架构 · 优缺点</div>
+          <div><b>3.5 min</b>录屏演示：提问 → 工具链 → 图表 → 校验</div>
+          <div><b>项目</b>OHCP · 2024 全国城市空气质量</div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">0:00–0:15</span></p>
+          <p>各位老师好，我们做的是空气质量时序分析 Agent。用户只需要一句中文提问，
+            系统就会自动完成数据清洗、聚合统计、国标超标研判、画图和结论输出。</p>
+          <p>技术上用了 Hadoop、Hive、MapReduce、MySQL 和 Python，下面用一分半介绍技术栈和取舍，
+            再用三分半录屏演示完整流程。</p>
+        </div>
+      </section>
+
+      <!-- 2 技术栈 -->
+      <section class="slide">
+        <h2><span class="no">01</span>技术栈：每一层都有明确分工</h2>
+        <p class="subtitle">不是堆技术，而是让“存储—计算—服务—智能”各司其职</p>
+        <div class="body">
+          <div class="grid-3">
+            <div class="card">
+              <span class="tag">Hadoop 3.3.6</span>
+              <h4>HDFS + YARN</h4>
+              <p>按月分片写入 HDFS，原始分片留档、清洗分片供计算；
+                 计算与存储分离，预留横向扩容接口。</p>
+            </div>
+            <div class="card">
+              <span class="tag">Hive 3.1.3</span>
+              <h4>ODS → DWD → DWS → ADS</h4>
+              <p>SQL 完成类型转换、量程过滤、城市日均与年月聚合；
+                 口径与 Python 侧一致。</p>
+            </div>
+            <div class="card">
+              <span class="tag">MapReduce Streaming</span>
+              <h4>独立再算一遍</h4>
+              <p>Python 写 map/reduce 统计城市 PM2.5 均值，
+                 与 Hive 结果逐城市对账。</p>
+            </div>
+            <div class="card">
+              <span class="tag">MySQL 8.0</span>
+              <h4>结果库</h4>
+              <p>3 张事实表 + 维表 + 视图 + 存储过程 + 定时事件；
+                 Agent 与前端毫秒级查询。</p>
+            </div>
+            <div class="card">
+              <span class="tag">Python 3.10</span>
+              <h4>pandas · matplotlib · unittest</h4>
+              <p>分片清洗引擎、国标判定、图表与 37 项自动化测试；
+                 全部纯函数、可单测。</p>
+            </div>
+            <div class="card">
+              <span class="tag">ReAct Agent</span>
+              <h4>8 个工具 + 双模规划</h4>
+              <p>LLM 只做任务拆解；无 Key/断网自动切规则规划器；
+                 Web 端零依赖（http.server）。</p>
+            </div>
+          </div>
+          <div class="stack-note">
+            关键约束：<b>大模型不参与任何数值计算</b>，所有统计与判定都在本地真实数据上由工具完成，
+            结果可复算、可对账。
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">0:15–0:55</span></p>
+          <p>我们的技术栈分四层：Hadoop 负责存储，Hive 和 MapReduce 负责计算，MySQL 做结果服务，
+            Python 负责数据引擎和 Agent。</p>
+          <p>特别说明两点：第一，Hive 和 MapReduce 会把同一个指标各算一遍，用来对账；
+            第二，大模型只做任务规划，所有数字来自本地工具，避免编造结果。</p>
+        </div>
+      </section>
+
+      <!-- 3 架构 -->
+      <section class="slide">
+        <h2><span class="no">02</span>全链路架构：从真实数据到一句结论</h2>
+        <p class="subtitle">分片批处理贯穿始终，361 天数据不一次性载入内存</p>
+        <div class="body">
+          <div class="flow">
+            <div class="flow-row">
+              <div class="flow-node dark"><b>真实公开数据</b>2024 全国城市<br>361 天 · 342 城</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node"><b>按月分片</b>12 个 chunk<br>约 300 万行</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node hi"><b>清洗 DWD</b>缺失填充 · 3×IQR<br>去重 · 物理量程</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node"><b>HDFS / Hive</b>ODS → DWD<br>→ DWS → ADS</div>
+            </div>
+            <div class="flow-row">
+              <div class="flow-node"><b>MapReduce 对账</b>Streaming<br>独立计算城市均值</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node"><b>MySQL 结果库</b>事实/维表<br>视图 · 存储过程</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node hi"><b>ReAct Agent</b>8 工具 · 双模规划<br>记忆 · 校验 · 告警</div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-node dark"><b>交付</b>四段式结论<br>PNG 图表 · Web</div>
+            </div>
+          </div>
+          <p class="flow-caption">
+            统计口径唯一来源：<code>core/gb3095.py</code>（GB 3095—2012 二级标准）；
+            每个环节都有落盘产物：清洗报告、Hive vs pandas、MapReduce vs Hive、MySQL vs 本地。
+          </p>
+          <div class="quote">
+            <b>为什么强调“分片”？</b> 读取、清洗、聚合都按月 chunk 处理；
+            全年 300 万行不会一次性进内存，换成多年数据只需增加分片文件。
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">0:55–1:15</span></p>
+          <p>链路从左到右：真实数据先按月分片，清洗后进 HDFS 和 Hive 四层建模，
+            MapReduce 独立再算一遍，结果落到 MySQL，最后 Agent 读数据、调工具、出结论。</p>
+          <p>三个引擎的结果会互相对账，保证不是“跑通一次”的偶然结果。</p>
+        </div>
+      </section>
+
+      <!-- 4 优点 -->
+      <section class="slide">
+        <h2><span class="no">03</span>优点：结果可信、演示可靠</h2>
+        <p class="subtitle">相比“能跑通”的同类方案，我们多做了一步：让结果可证明</p>
+        <div class="body">
+          <div class="grid-2">
+            <div class="points">
+              <div class="point">
+                <span class="num">1</span>
+                <div><h4>真实数据、可复核</h4>
+                  <p>国家城市空气质量实时发布平台公开数据；分片清洗前后行数、缺失、越界、填充量全部落盘。</p></div>
+              </div>
+              <div class="point">
+                <span class="num">2</span>
+                <div><h4>三方对账</h4>
+                  <p>Hive、MapReduce、pandas 对同一指标各算一遍；偏差写入
+                    <code>hive_vs_pandas.json</code>、<code>mapreduce_vs_hive.json</code>。</p></div>
+              </div>
+              <div class="point">
+                <span class="num">3</span>
+                <div><h4>演示不翻车</h4>
+                  <p>LLM 规划 + 规则兜底双模；无网络、无 Key 依然能完整跑通 3 个官方示例。</p></div>
+              </div>
+            </div>
+            <div class="points">
+              <div class="point">
+                <span class="num">4</span>
+                <div><h4>结果有护栏</h4>
+                  <p>5 类校验：非空、物理范围、国标一致性、加权独立复算、MySQL 跨引擎对账；
+                    不通过会明确标红。</p></div>
+              </div>
+              <div class="point">
+                <span class="num">5</span>
+                <div><h4>业务化思政</h4>
+                  <p>超标研判自然带出国标限值科普与 1~2 行生态感悟，重污染自动附污染物健康科普卡片。</p></div>
+              </div>
+              <div class="point">
+                <span class="num">6</span>
+                <div><h4>零依赖 Web 交付</h4>
+                  <p>标准库 <code>http.server</code> 同时托管前端与 API，一条命令启动，现场少一个故障点。</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">1:15–1:25</span></p>
+          <p>优点可以概括成两句话：第一，真实数据和三方对账让结果可信；
+            第二，双模规划和结果校验让现场演示可靠，断网也能跑。</p>
+        </div>
+      </section>
+
+      <!-- 5 局限 -->
+      <section class="slide">
+        <h2><span class="no">04</span>局限与应对：不回避边界</h2>
+        <p class="subtitle">一小时比赛做的是可交付的最小闭环，而不是“无所不能”</p>
+        <div class="body">
+          <table class="table">
+            <thead>
+              <tr><th>局限</th><th>说明</th><th>应对 / 下一步</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>单机伪分布式</td>
+                <td>HDFS/YARN 部署在同一台机器，不是真实多节点集群。</td>
+                <td>分片接口与 HDFS 路径已保留，增加节点即可横向扩展，无需改业务代码。</td>
+              </tr>
+              <tr>
+                <td>指标范围有限</td>
+                <td>当前覆盖 6 项常规污染物 + AQI，未包含更多特征污染物。</td>
+                <td>配置表驱动，新增指标只需扩展字段映射与国标限值表。</td>
+              </tr>
+              <tr>
+                <td>大模型依赖</td>
+                <td>自然语言理解上限受模型能力影响；API 可能限流或断网。</td>
+                <td>只用于任务拆解；超时 8 秒自动切规则规划器，计算永不离线。</td>
+              </tr>
+              <tr>
+                <td>批处理时效</td>
+                <td>数据更新需要重跑分片与聚合，不是实时流。</td>
+                <td>分片命名与读取接口已预留，可接 Flink/Spark Streaming 增量计算。</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="quote">
+            <b>取舍逻辑：</b> 一小时里优先保证“真实数据 + 正确口径 + 可复现演示”；
+            扩展性通过接口与配置预留，而不是堆功能。
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">1:25–1:30</span></p>
+          <p>局限主要有四个：单机伪分布式、指标范围、模型依赖和批处理时效。
+            我们的应对分别是：分片扩容、配置扩展、规则兜底、预留流式接口。</p>
+        </div>
+      </section>
+
+      <!-- 6 证据 -->
+      <section class="slide">
+        <h2><span class="no">05</span>质量证据：每个数字都能复核</h2>
+        <p class="subtitle">不是“演示成功”，而是“结果可信、过程可复现”</p>
+        <div class="body">
+          <div class="metrics">
+            <div class="metric"><b>361</b><span>天真实监测数据<br>（源站 5 天缺档，如实说明）</span></div>
+            <div class="metric"><b>342</b><span>个城市<br>覆盖 31 个省级行政区</span></div>
+            <div class="metric"><b>≈300万</b><span>行小时级记录<br>按月 12 个分片</span></div>
+            <div class="metric"><b>37</b><span>项自动化测试<br>全部通过（含 Web E2E）</span></div>
+          </div>
+          <div class="proof">
+            <span><b>清洗</b> output/cleaning_report.json</span>
+            <span><b>Hive vs pandas</b> output/hive_vs_pandas.json</span>
+            <span><b>MapReduce vs Hive</b> output/mapreduce_vs_hive.json</span>
+            <span><b>MySQL vs 本地</b> output/mysql_vs_local.json</span>
+            <span><b>测试报告</b> output/test_report.txt</span>
+          </div>
+          <div class="quote">
+            <b>可复现：</b> <code>python3 run_all.py 2 12</code> 从分片到图表、MySQL、测试一键重跑；
+            <code>python3 -m unittest discover -s tests</code> 可单独验证。
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">1:30–1:35（过渡到录屏）</span></p>
+          <p>这些数字都能在 output 目录里找到对应文件，测试和三层对账都可以现场重跑。
+            下面进入三分半的录屏演示。</p>
+        </div>
+      </section>
+
+      <!-- 7 录屏路线 -->
+      <section class="slide">
+        <h2><span class="no">06</span>3.5 分钟录屏路线</h2>
+        <p class="subtitle">先跑示例，再展示追问与告警，最后用校验和概览收尾</p>
+        <div class="body">
+          <div class="route">
+            <div class="step">
+              <span class="time">0:00–1:10</span>
+              <h4>示例 1：TOP5 + 月度曲线</h4>
+              <p>点「示例 1」→ 讲清 8 步工具链 → 展开 ReAct 轨迹 →
+                 展示 TOP5 表格、国标判定与折线图。</p>
+            </div>
+            <div class="step">
+              <span class="time">1:10–2:10</span>
+              <h4>多轮追问：PM10</h4>
+              <p>点「追问」→ Agent 自动带入上一轮 5 个城市 →
+                 说明记忆机制，不用重复输入城市。</p>
+            </div>
+            <div class="step">
+              <span class="time">2:10–3:10</span>
+              <h4>省份占比 + 突变告警</h4>
+              <p>点「示例 2」看饼图与省份超标率；点「告警」看
+                 月度突变与污染突发时段。</p>
+            </div>
+            <div class="step">
+              <span class="time">3:10–3:30</span>
+              <h4>收尾：概览 + 校验</h4>
+              <p>回到顶部看 361 天/342 城/12 分片，指出“校验 5/5”徽章，
+                 口述三方对账与 37 项测试。</p>
+            </div>
+          </div>
+          <div class="checklist">
+            <span>✓ 先运行 ./start.sh</span>
+            <span>✓ 顶部三个状态胶囊为绿色</span>
+            <span>✓ 浏览器缩放 125%</span>
+            <span>✓ 提前跑一次示例 1 预热缓存</span>
+            <span>✓ 关闭通知/终端窗口</span>
+          </div>
+          <div class="quote">
+            <b>收尾话术：</b> 我们不仅让 Agent 跑通，还让每一个数字可对账、每一次演示不翻车，
+            这就是我们与同类方案最大的差异。
+          </div>
+        </div>
+        <div class="slide-notes" hidden>
+          <p><span class="t">录屏提示</span></p>
+          <ul>
+            <li>分辨率 1920×1080，浏览器全屏，缩放 125%。</li>
+            <li>先跑一次示例 1 预热（清洗与日均缓存已就绪时 1 秒内返回）。</li>
+            <li>录屏时语速放慢，鼠标指向“规划器、工具步数、校验 5/5”三个徽章。</li>
+            <li>若网络/模型不可用，提前在页面选“规则规划器”，讲解词不变。</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div class="progress"><i id="progressBar"></i></div>
+    <div class="counter"><span id="pageNow">1</span> / <span id="pageTotal">7</span></div>
+    <div class="nav">
+      <button id="prevBtn" type="button" aria-label="上一页">‹</button>
+      <button id="nextBtn" type="button" aria-label="下一页">›</button>
+    </div>
+  </footer>
+
+  <aside class="notes" id="notes">
+    <h3>讲稿 · 按 N 关闭</h3>
+    <div id="notesBody"></div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const bar = document.getElementById("progressBar");
+  const pageNow = document.getElementById("pageNow");
+  const pageTotal = document.getElementById("pageTotal");
+  const notes = document.getElementById("notes");
+  const notesBody = document.getElementById("notesBody");
+  let index = 0;
+
+  pageTotal.textContent = slides.length;
+
+  function render() {
+    slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+    pageNow.textContent = index + 1;
+    bar.style.width = ((index + 1) / slides.length * 100) + "%";
+    const box = slides[index].querySelector(".slide-notes");
+    notesBody.innerHTML = box ? box.innerHTML : "<p>（本页无讲稿）</p>";
+    if (location.hash !== "#" + (index + 1)) {
+      history.replaceState(null, "", "#" + (index + 1));
+    }
+  }
+
+  function go(target) {
+    index = Math.max(0, Math.min(slides.length - 1, target));
+    render();
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") {
+      event.preventDefault(); go(index + 1);
+    } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+      event.preventDefault(); go(index - 1);
+    } else if (event.key === "Home") {
+      go(0);
+    } else if (event.key === "End") {
+      go(slides.length - 1);
+    } else if (event.key === "n" || event.key === "N") {
+      notes.classList.toggle("open");
+    } else if (event.key === "f" || event.key === "F") {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen &&
+          document.documentElement.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  });
+
+  document.getElementById("prevBtn").addEventListener("click", () => go(index - 1));
+  document.getElementById("nextBtn").addEventListener("click", () => go(index + 1));
+
+  let startX = null;
+  document.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; },
+    { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) go(index + (dx < 0 ? 1 : -1));
+    startX = null;
+  }, { passive: true });
+
+  const fromHash = parseInt((location.hash || "").replace("#", ""), 10);
+  index = Number.isFinite(fromHash) && fromHash >= 1 && fromHash <= slides.length
+    ? fromHash - 1 : 0;
+  render();
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+

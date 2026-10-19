@@ -1,0 +1,48 @@
+自动化测试报告  2026-10-19 09:47:00
+======================================================================
+测试框架：unittest（pytest 可直接运行同一套用例）
+覆盖范围：国标判定 / 数据清洗 / 分片聚合 / 规划器 / E2E / 跨引擎对账
+
+
+test_full_chain (test_agent_e2e.AgentE2ETest) ... ok
+test_trace_is_persisted (test_agent_e2e.AgentE2ETest) ... ok
+test_clean_removes_duplicates_and_empty_rows (test_cleaning.CleaningTest) ... ok
+test_no_negative_or_huge_values (test_cleaning.CleaningTest) ... ok
+test_out_of_range_and_fill (test_cleaning.CleaningTest) ... ok
+test_quality_generated (test_cleaning.CleaningTest) ... ok
+test_annual_mean_matches_independent_calc (test_data_store.DataStoreTest) ... ok
+test_city_season_exceed (test_data_store.DataStoreTest) ... ok
+test_detect_jumps_returns_monthly (test_data_store.DataStoreTest) ... ok
+test_monthly_series (test_data_store.DataStoreTest) ... ok
+test_o3_max8h_uses_8h_period (test_data_store.DataStoreTest) ... ok
+test_province_exceed_counts (test_data_store.DataStoreTest) ... ok
+test_stats (test_data_store.DataStoreTest) ... ok
+test_key_sections_present (test_defense_html.DefenseHTMLTest) ... ok
+test_no_external_resources (test_defense_html.DefenseHTMLTest) ... ok
+test_slide_count (test_defense_html.DefenseHTMLTest) ... ok
+test_start_scripts_exist (test_defense_html.DefenseHTMLTest) ... ok
+test_eco_tip_is_short (test_gb3095.GB3095Test) ... ok
+test_limits_of_all_pollutants (test_gb3095.GB3095Test) ... ok
+test_o3_daily_max_8h (test_gb3095.GB3095Test) ... ok
+test_pm25_annual_boundary (test_gb3095.GB3095Test) ... ok
+test_pm25_daily_boundary (test_gb3095.GB3095Test) ... ok
+test_quality_levels (test_gb3095.GB3095Test) ... ok
+test_standard_brief_mentions_gb (test_gb3095.GB3095Test) ... ok
+test_top_city_matches_local (test_mysql_alignment.MySQLAlignmentTest) ... ok
+test_alert_intent (test_planner.PlannerTest) ... ok
+test_example1_top5_with_monthly_line (test_planner.PlannerTest) ... ok
+test_example2_province_share_pie (test_planner.PlannerTest) ... ok
+test_example3_beijing_summer_o3 (test_planner.PlannerTest) ... ok
+test_memory_follow_up (test_planner.PlannerTest) ... ok
+test_pro_template (test_planner.PlannerTest) ... ok
+test_ask_and_chart (test_web.WebTest) ... ok
+test_empty_question_rejected (test_web.WebTest) ... ok
+test_health (test_web.WebTest) ... ok
+test_index_and_static (test_web.WebTest) ... ok
+test_overview (test_web.WebTest) ... ok
+test_reset (test_web.WebTest) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 1.043s
+
+OK

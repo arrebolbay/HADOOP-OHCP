@@ -1,0 +1,4 @@
+pandas>=2.0
+matplotlib>=3.5
+pymysql>=1.0
+requests>=2.28

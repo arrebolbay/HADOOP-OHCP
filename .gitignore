@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# 数据：体积大，按 README 下载 / 生成（不入库）
+data/raw/daily/*.csv
+data/raw/chunks/*.csv
+data/cache/**/*.csv
+data/cache/**/*.json
+data/cache/**/*.gz
+data/reference/pcas-code.json
+data/fonts/*.ttf
+data/fonts/*.ttc
+data/fonts/*.otf
+
+# 运行产物：日志、轨迹、临时报告、图表（可复现生成）
+logs/
+output/charts/
+output/agent_trace_*.json
+output/agent_trace.log
+output/analysis_*.md
+output/analysis_history.md
+*.tmp
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store

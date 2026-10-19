@@ -1,0 +1,16 @@
+{
+  "mysql_top": {
+    "city": "和田地区",
+    "annual_mean": "82.89"
+  },
+  "local_top": {
+    "city": "和田地区",
+    "province": "新疆",
+    "value": 82.89123116343491,
+    "days": 361,
+    "limit": 35.0,
+    "exceeded": true,
+    "ratio": 2.3683208903838544
+  },
+  "rel_diff": 1.485275845983591e-05
+}

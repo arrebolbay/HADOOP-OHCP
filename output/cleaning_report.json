@@ -1,0 +1,23 @@
+{
+  "year": 2024,
+  "chunks": 12,
+  "rows_in": 2938933,
+  "rows_out": 2938933,
+  "duplicates": 0,
+  "dropped_all_missing": 0,
+  "out_of_range": 1119,
+  "iqr_clipped": 178445,
+  "filled": 36116,
+  "filled_by_col": {
+    "pm25": 1905,
+    "pm10": 25420,
+    "so2": 1376,
+    "no2": 1465,
+    "co": 4212,
+    "o3": 1738,
+    "aqi": 0
+  },
+  "missing_ratio_before": 0.0017555448087549364,
+  "method": "物理范围校验 + 城市 IQR 截断 + 同城市中位数填充 + 去重",
+  "output_dir": "\\\\wsl.localhost\\Ubuntu-22.04\\home\\bayern\\编程空间\\OHCP\\data\\cache\\cleaned"
+}
