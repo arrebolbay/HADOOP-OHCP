@@ -93,7 +93,7 @@ python3 scripts/download_real_data.py --start 2024-01-01 --end 2024-12-31 --work
 
 ```bash
 # 可选：新克隆自检（依赖、数据、37 项测试）
-python3 scripts/check_fresh_clone.sh
+./scripts/check_fresh_clone.sh
 
 chmod +x start.sh
 ./start.sh                 # 后端 API + 前端页面一起启动，自动打开浏览器
