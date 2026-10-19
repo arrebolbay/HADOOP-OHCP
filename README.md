@@ -30,6 +30,17 @@
 额外支持多轮追问（"再看这几个城市的 PM10 超标情况"）与突变告警
 （"检测北京市 PM2.5 异常突变"）。
 
+### 效果预览
+
+![2024 年空气质量综合分析看板](output/05_分析看板.png)
+
+- 答辩 HTML 幻灯片：[`docs/答辩演示.html`](docs/答辩演示.html)（独立文件，不是产品前端）
+- Agent 演示记录（5 个问题 + 工具轨迹）：[`output/04_Agent演示记录.md`](output/04_Agent演示记录.md)
+- 测试报告（37 项）：[`output/test_report.txt`](output/test_report.txt)
+- 三方对账：[`output/hive_vs_pandas.json`](output/hive_vs_pandas.json)、
+  [`output/mapreduce_vs_hive.json`](output/mapreduce_vs_hive.json)、
+  [`output/mysql_vs_local.json`](output/mysql_vs_local.json)
+
 ---
 
 ## 二、快速开始
